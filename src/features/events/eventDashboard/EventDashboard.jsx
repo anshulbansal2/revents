@@ -4,16 +4,41 @@ import EventList from './EventList';
 import EventForm from '../eventForm/EventForm';
 import {sampleData} from '../../../app/api/sampleData';
 
-export default function EventDashboard({formOpen, setFormOpen}) {
+export default function EventDashboard({formOpen, setFormOpen, selectEvent, selectedEvent}) {
     const [events, setEvents] = useState(sampleData);
+   
+
+    function handleCreateEvent(event) {
+        setEvents([...events, event])
+    }
+
+    function handleUpdatedEvent(updatedEvent) {
+        setEvents(events.map(evt => evt.id === updatedEvent.id ? updatedEvent: evt));
+        selectEvent(null);
+    }
+
+    function handleDeleteEvents(eventId) {
+        setEvents(events.filter(evt=> evt.id !== eventId));
+      }
+
     return (
         <Grid>
             <Grid.Column width={10}>
-                <EventList events={events} />
+                <EventList 
+                events={events} 
+                selectEvent={selectEvent}
+                deleteEvent={handleDeleteEvents}/>
             </Grid.Column>
             <Grid.Column width={6}>
-                {formOpen &&
-                <EventForm setFormOpen={setFormOpen}/> }
+                {formOpen && 
+                <EventForm 
+                setFormOpen={setFormOpen} 
+                setEvents={setEvents} 
+                createEvent={handleCreateEvent}
+                selectedEvent={selectedEvent}
+                updatedEvent={handleUpdatedEvent}
+                key={selectedEvent ? selectedEvent.id : null}
+                /> }
             </Grid.Column>
         </Grid>
     )
